@@ -1,6 +1,6 @@
 import telebot
 from config import TOKEN
-from handlers import register_handlers
+from handlers.message import register_handlers
 
 
 def main() -> None:
