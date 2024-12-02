@@ -1,4 +1,4 @@
-from database import get_connection
+from db.database import get_connection
 
 
 def init_db() -> None:
@@ -52,3 +52,18 @@ def delete_words(word_russian: str) -> None:
         )
         conn.commit()
     conn.close
+
+
+def get_words() -> None:
+    """
+    Получаем слова
+    """
+
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT word_russian, word_english FROM words;")
+        result = cursor.fetchall()
+    conn.close()
+
+    return result

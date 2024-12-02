@@ -1,11 +1,13 @@
 import random
 import telebot
 from telebot import types
+from telebot.types import Message
 from telebot.handler_backends import StatesGroup, State
+from db.models import add_words, delete_words, get_words
 
 
 class Command:
-    ADD_WORD = "Добавить слово ➕"
+    ADD_WORD = "Добавить слово"
     DELETE_WORD = "Удалить слово🔙"
     NEXT = "Дальше ⏭"
 
@@ -16,9 +18,9 @@ class MyStates(StatesGroup):
     another_words = State()
 
 
-def register_handlers(bot: telebot) -> None:
+def register_handlers(bot: telebot.TeleBot) -> None:
     @bot.message_handler(commands=["start"])
-    def send_welcome(message) -> None:
+    def send_welcome(message: Message) -> None:
         bot.send_message(
             message.chat.id,
             "Привет 👋 Давай попрактикуемся в английском языке. Тренировки можешь проходить в удобном для себя темпе.",
@@ -53,10 +55,14 @@ def register_handlers(bot: telebot) -> None:
             data["other_words"] = other_words
 
     @bot.message_handler(func=lambda message: True, content_types=["text"])
-    def message_reply(message) -> None:
+    def message_reply(message: Message) -> None:
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             target_word = data["target_word"]
         if message.text == target_word:
             bot.send_message(message.chat.id, "Всё правильно")
         else:
             bot.send_message(message.chat.id, "Неправильно. Попробуй снова!")
+
+    @bot.message_handler(func=lambda message: message.text == "Нажми меня")
+    def add_new_words(message: Message) -> None:
+        bot.send_message(message.chat.id, "напишите слово на русском")
